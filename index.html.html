@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>👩‍❤️‍💋‍👨Dokumen Rahasia SEKJANG — Bisma</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* ---------------- basic ---------------- */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            min-height:100vh;
+            color:#111;
+            overflow-x:hidden;
+        }
+
+        /* ---------- page layout & transitions ---------- */
+        .page {
+            display:none;
+            min-height:100vh;
+            width:100%;
+            padding:20px;
+            align-items:center;
+            justify-content:center;
+            text-align:center;
+            opacity:0;
+            transition: opacity .45s ease;
+        }
+        .page.active { display:flex; flex-direction:column; opacity:1; }
+
+        /* ---------- shared UI blocks ---------- */
+        .secret-container, .confirmation-container, .quiz-container {
+            background: rgba(0,0,0,0.9);
+            border: 3px solid #ff6b35;
+            box-shadow: 0 0 50px rgba(255,107,53,0.25);
+            border-radius:20px;
+            padding:36px;
+            max-width:680px;
+            text-align:left;
+            color:white;
+        }
+        .confirmation-container, .quiz-container { background: rgba(57, 111, 237, 0.95); color:#222; }
+
+        .warning-icon { font-size:4rem; color:#ff6b35; margin-bottom:12px; animation: shake .5s infinite alternate; }
+        @keyframes shake { from{transform:rotate(-5deg)} to{transform:rotate(5deg)} }
+
+        .secret-title { color:#ff6b35; font-size:1.6rem; font-weight:800; margin-bottom:8px; text-shadow:2px 2px 6px rgba(0,0,0,.4); }
+        .secret-text { font-size:1rem; line-height:1.6; color: #fff; margin-bottom:16px; }
+
+        .quiz-input {
+            width:100%;
+            padding:14px;
+            font-size:1rem;
+            border-radius:12px;
+            border:3px solid #ddd;
+            text-align:center;
+            margin-bottom:12px;
+        }
+
+        .notification {
+            background: linear-gradient(45deg,#dc3545,#ff1744);
+            color:white;
+            padding:16px;
+            border-radius:12px;
+            margin-top:12px;
+            display:none;
+            font-weight:700;
+            animation: flash .6s infinite alternate;
+        }
+        @keyframes flash { from{opacity:1} to{opacity:.85} }
+
+        /* ---------- app container (page4) ---------- */
+        .app-container {
+            width: min(1024px, 95%);
+            height: 720px;
+            margin: 20px auto;
+            border: 12px solid #0b0b0b;
+            border-radius: 28px;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(180deg,#000,#020202);
+            box-shadow: 0 18px 60px rgba(0,0,0,.45);
+        }
+
+        .home-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display:grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap:24px;
+            padding:40px;
+            align-content:start;
+            color:white;
+            z-index: 10;
+            background: transparent;
+        }
+        
+        .home-grid.hidden { display: none !important; }
+
+        .app-icon {
+            width:88px;
+            height:88px;
+            border-radius:18px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:42px;
+            transition: all .25s ease;
+            box-shadow: 0 6px 20px rgba(0,0,0,.4);
+        }
+        .app-icon:hover { transform: translateY(-6px) scale(1.06); box-shadow: 0 12px 30px rgba(0,0,0,.5); }
+
+        /* Gradient colors for app icons */
+        .gallery-icon { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); }
+        .camera-icon { background: linear-gradient(135deg, #4ecdc4, #44a08d); }
+        .whatsapp-icon { background: linear-gradient(135deg, #25d366, #128c7e); }
+        .spotify-icon { background: linear-gradient(135deg, #1db954, #1ed760); }
+        .capcut-icon { background: linear-gradient(135deg, #ff9500, #ffb84d); }
+        .strava-icon { background: linear-gradient(135deg, #fc4c02, #ff6b35); }
+
+        .app-panel {
+            position:absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg,#667eea,#764ba2);
+            padding:30px;
+            display:none;
+            overflow:auto;
+            z-index: 20;
+        }
+        .app-panel.active { display:block; }
+
+        /* gallery */
+        .columns-3 { column-count:3; column-gap:1rem; }
+        .thumbnail { width:100%; border-radius:10px; margin-bottom:12px; display:block; }
+
+        /* whatsapp */
+        .msg-area { height: calc(100% - 160px); overflow:auto; padding:12px; background:#f2f2f2; border-radius:12px; }
+        .message-bubble { max-width:70%; padding:12px 14px; border-radius:16px; margin-bottom:10px; word-wrap:break-word; display:inline-block; }
+        .message-sent { background:#007aff; color:white; margin-left:auto; border-bottom-right-radius:4px; }
+        .message-received { background:#e5e5ea; color:#111; margin-right:auto; border-bottom-left-radius:4px; }
+
+        /* carousel */
+        .carousel-container { position:relative; width:100%; max-width:720px; margin:0 auto; overflow:hidden; border-radius:14px; }
+        .carousel-track { display:flex; transition: transform .5s ease-in-out; }
+        .carousel-item { flex:0 0 100%; padding:20px; box-sizing:border-box; text-align:center; }
+        .placeholder-image { width:100%; height:420px; background: linear-gradient(135deg,#667eea,#764ba2); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:3rem; color:white; margin-bottom:12px; }
+
+        .carousel-nav { position:absolute; top:50%; transform:translateY(-50%); background: rgba(0,0,0,.5); color:white; border:none; width:46px; height:46px; border-radius:50%; font-size:1.2rem; cursor:pointer; }
+        .carousel-nav.prev { left:10px; }
+        .carousel-nav.next { right:10px; }
+
+        /* letter */
+        .letter-container { background:#fdfaf1; border-radius:20px; padding:36px; max-width:720px; text-align:left; line-height:1.8; font-family: "Courier New", Courier, monospace; }
+        .typed-text::after { content:'|'; display:inline-block; animation: blink .7s infinite; }
+        @keyframes blink { 50% { opacity:0; } }
+
+        /* tulip rain */
+        .tulip { position:fixed; pointer-events:none; z-index:9999; font-size:1.6rem; animation: fall linear; }
+        @keyframes fall { from { transform: translateY(-20vh) rotate(0deg); opacity:1; } to { transform: translateY(120vh) rotate(360deg); opacity:0; } }
+
+        /* buttons */
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 24px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .3s ease;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(255, 107, 53, 0.6);
+        }
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(40, 167, 69, 0.6);
+        }
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        .gallery-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        /* responsive */
+        @media (max-width: 900px) {
+            .app-container { height: 640px; }
+            .home-grid { grid-template-columns: repeat(3,1fr); padding:20px; gap:14px; }
+            .app-icon { width:72px; height:72px; font-size:34px; }
+        }
+        @media (max-width: 480px) {
+            .home-grid { grid-template-columns: repeat(2,1fr); }
+            .app-container { width: 95vw; height: 80vh; border-radius:16px; border-width:8px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hidden audio element untuk autoplay Spotify -->
+    <audio id="backgroundMusic" loop>
+        <source src="" type="audio/mpeg">
+    </audio>
+
+    <!-- ========== PAGE 1 ========== -->
+    <div class="page active" id="page1">
+        <div class="secret-container">
+            <div class="warning-icon">🔒</div>
+            <h1 class="secret-title">⚠️ RAHASIA ALAM SEMESTA ⚠️</h1>
+            <p class="secret-text">
+                🚫 DOKUMEN TOP SECRET 🚫<br>
+                LeveL∞: TOP SECRET<br><br>
+                ⚡ BUKA KETIKA KAMU DALAM SITUASI KONDUSIF ⚡<br><br>
+                Dokumen ini berisi informasi yang sangat sensitif tentang sebuah hubungan untuk agen kode Kitsu43v3r!
+            </p>
+            <div style="display:flex; gap:12px; justify-content:flex-end;">
+                <button class="btn btn-primary" onclick="goToPage(2)">🔓 IM READY</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE 2 ========== -->
+    <div class="page" id="page2">
+        <div class="confirmation-container">
+            <div style="font-size:4rem; text-align:center; margin-bottom:8px;">😼🛡️🛰️</div>
+            <h2 style="color:#333; font-size:1.25rem; font-weight:800; margin-bottom:12px;">Agent Kitsu43v3r, transmisi rahasia verification</h2>
+            <p style="color:#666; margin-bottom:16px;">
+                BUKA HANYA JIKA KAMU SUDAH SIAP 😾<br>
+                JIKA KAMU BELUM SIAP,LEBIH BAIK JANGAN DI LANJUT! ✨
+            </p>
+            <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                <button class="btn btn-success" onclick="goToPage(3)">⚡ I'M READYY LET'S FIGHT TOGETHER!</button>
+                <button class="btn btn-danger" onclick="refuseOpen(event)">😰 I DONT CAREE!</button>
+            </div>
+            <div id="refuseMessage" style="display:none; margin-top:18px; color:#ff6b35; font-weight:700;">
+                <p>Hayooo! masa ratu air gak peduli sih sama fansnya😤<br> kamu kayaknya bukan kirana prameswari aka ratu air yang aku kenal nich🎯</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE 3 ========== -->
+    <div class="page" id="page3">
+        <div class="quiz-container">
+            <h2 style="color:#333; font-size:1.2rem; font-weight:800; margin-bottom:10px;">🔍 INI MENENTUKAN BAHWA KAMU AGENT KITSU43V3R YANG ASLI 🔍</h2>
+            <p style="color:#666; margin-bottom:12px;">
+                Masukkan password untuk membuka dokumen:<br>
+                <small style="opacity:.7">(Hint: panggilan kamu dari tante kamu + bocil windah)</small>
+            </p>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <input type="text" id="answerInput" class="quiz-input" placeholder="Ketik password di sini..." onkeypress="if(event.key==='Enter') checkAnswer()">
+                <button class="btn btn-primary" onclick="checkAnswer()">🔍 VERIFY</button>
+            </div>
+            <div class="notification" id="wrongNotification">
+                ⚠️ SALAH! ⚠️<br>
+                Perangkat akan memasuki mode penghapus ingatan otomatis dalam waktu<br>
+                <span id="countdown">5</span>...
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE 4: HOME / APPS ========== -->
+    <div class="page" id="page4">
+        <div class="app-container" id="appContainer">
+            <div id="background" style="position:absolute; inset:0; background:linear-gradient(135deg,#667eea,#764ba2); z-index:1;"></div>
+
+            <!-- Home Screen -->
+            <div id="homeScreen" class="home-grid">
+                <button onclick="openApp('gallery')" class="flex flex-col items-center">
+                    <div class="app-icon gallery-icon">📸</div>
+                    <span class="text-sm font-medium mt-2">Gallery</span>
+                </button>
+
+                <button onclick="openApp('camera')" class="flex flex-col items-center">
+                    <div class="app-icon camera-icon">📷</div>
+                    <span class="text-sm font-medium mt-2">Camera</span>
+                </button>
+
+                <button onclick="openApp('whatsapp')" class="flex flex-col items-center">
+                    <div class="app-icon whatsapp-icon">💬</div>
+                    <span class="text-sm font-medium mt-2">WhatsApp</span>
+                </button>
+
+                <button onclick="openApp('spotify')" class="flex flex-col items-center">
+                    <div class="app-icon spotify-icon">🎵</div>
+                    <span class="text-sm font-medium mt-2">Spotify</span>
+                </button>
+
+                <button onclick="openApp('capcut')" class="flex flex-col items-center">
+                    <div class="app-icon capcut-icon">🎬</div>
+                    <span class="text-sm font-medium mt-2">CapCut</span>
+                </button>
+
+                <button onclick="openApp('strava')" class="flex flex-col items-center">
+                    <div class="app-icon strava-icon">🏃</div>
+                    <span class="text-sm font-medium mt-2">Strava</span>
+                </button>
+
+                <button onclick="showBirthdayMessage()" class="flex flex-col items-center">
+                    <div class="app-icon" style="background:linear-gradient(135deg,#ff69b4,#ff1493)">🎂</div>
+                    <span class="text-sm font-medium mt-2">Birthday</span>
+                </button>
+
+                <button onclick="goToPage(5)" class="flex flex-col items-center">
+                    <div class="app-icon" style="background:linear-gradient(135deg,#ffd700,#ffed4e)">🖼️</div>
+                    <span class="text-sm font-medium mt-2">Memories</span>
+                </button>
+            </div>
+
+            <!-- ---------- Gallery App ---------- -->
+            <div id="galleryApp" class="app-panel">
+                <button onclick="closeApp()" class="mb-6 bg-gray-800 text-white px-4 py-2 rounded-lg">⬅ Back</button>
+                <h2 class="text-2xl font-bold text-white mb-4">Gallery</h2>
+                <input id="fileInput" type="file" accept="image/*" multiple class="mb-4 p-2 rounded-lg bg-white"/>
+                <div id="imageGallery" class="columns-3"></div>
+            </div>
+
+            <!-- ---------- Camera App ---------- -->
+            <div id="cameraApp" class="app-panel flex flex-col items-center">
+                <button onclick="closeApp()" class="mb-4 bg-gray-800 text-white px-4 py-2 rounded-lg self-start">⬅ Back</button>
+                <video id="cameraVideo" autoplay playsinline class="w-3/4 bg-gray-900 rounded-lg shadow-lg" style="max-height:400px;"></video>
+                <div class="flex gap-3 mt-4">
+                    <button onclick="switchCamera()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">🔄 Switch</button>
+                    <button onclick="capturePhoto()" class="bg-red-600 text-white px-6 py-3 rounded-full text-xl">⭕ Capture</button>
+                    <button onclick="downloadCapture()" class="bg-green-600 text-white px-4 py-2 rounded-lg">⬇️ Download</button>
+                </div>
+                <canvas id="captureCanvas" class="hidden"></canvas>
+            </div>
+
+            <!-- ---------- WhatsApp App ---------- -->
+            <div id="whatsappApp" class="app-panel flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <button onclick="closeApp()" class="bg-green-800 text-white px-4 py-2 rounded-lg">⬅ Back</button>
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-pink-500 flex items-center justify-center text-white">💕</div>
+                        <div>
+                            <div class="font-semibold text-white">kirana 💕</div>
+                            <div style="font-size:.85rem; color:#d1ffd6">online</div>
+                        </div>
+                    </div>
+                    <div style="width:48px"></div>
+                </div>
+                <div id="messagesContainer" class="msg-area mb-4"></div>
+                <div class="flex gap-3">
+                    <input id="messageInput" placeholder="Ketik pesan..." class="flex-1 p-3 rounded-full border border-gray-300" onkeypress="if(event.key==='Enter') sendMessage()"/>
+                    <button onclick="sendMessage()" class="bg-green-600 text-white px-4 py-2 rounded-full">➤</button>
+                </div>
+            </div>
+
+            <!-- ---------- Spotify App ---------- -->
+            <div id="spotifyApp" class="app-panel flex flex-col items-center">
+                <button onclick="closeApp()" class="mb-6 bg-gray-800 text-white px-4 py-2 rounded-lg self-start">⬅ Back</button>
+                <h2 class="text-3xl text-white mb-4">Now Playing 🎶</h2>
+                <div class="w-3/4 bg-black bg-opacity-40 p-6 rounded-xl mb-4">
+                    <div class="w-40 h-40 bg-gradient-to-br from-green-500 to-green-700 rounded-xl mx-auto mb-4 flex items-center justify-center text-6xl">🎵</div>
+                    <p class="text-white text-center text-2xl font-bold">Rayuan Perempuan Gila</p>
+                    <p class="text-green-300 text-center">Nadin Amizah</p>
+                </div>
+                <iframe 
+                    id="spotifyFrame"
+                    src="https://open.spotify.com/embed/track/1nYdkPCbHdYi4w7s2L6SHA?utm_source=generator&theme=0" 
+                    width="70%" 
+                    height="352" 
+                    frameborder="0" 
+                    allowfullscreen="" 
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                    loading="lazy"
+                    class="rounded-xl">
+                </iframe>
+            </div>
+
+            <!-- ---------- CapCut App ---------- -->
+            <div id="capcutApp" class="app-panel flex flex-col items-center">
+                <button onclick="closeApp()" class="mb-6 bg-gray-800 text-white px-4 py-2 rounded-lg self-start">⬅ Back</button>
+                <h2 class="text-3xl text-white mb-4">CapCut — Video Editor</h2>
+                <div class="w-11/12 bg-black bg-opacity-40 p-6 rounded-xl">
+                    <div class="w-full h-56 bg-gray-700 rounded-xl flex items-center justify-center text-white">🎬 Video Preview</div>
+                    <div class="flex gap-3 justify-center mt-4">
+                        <button class="bg-blue-600 px-4 py-2 rounded-lg text-white">✂️ Cut</button>
+                        <button class="bg-green-600 px-4 py-2 rounded-lg text-white">🎨 Edit</button>
+                        <button class="bg-purple-600 px-4 py-2 rounded-lg text-white">✨ Effects</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ---------- Strava App ---------- -->
+            <div id="stravaApp" class="app-panel flex flex-col items-center justify-center">
+                <button onclick="closeApp()" class="absolute top-6 left-6 bg-gray-800 text-white px-4 py-2 rounded-lg">⬅ Back</button>
+                <div class="text-8xl mb-6">🏃‍♂️💕🏃‍♀️</div>
+                <h1 class="text-6xl mb-6 font-bold" style="background: linear-gradient(45deg,#ff69b4,#ff1493,#ffa500); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">Bizm & Kirana Journey</h1>
+                <p class="text-2xl mb-4 text-white">Kita sudah berjalan bersama</p>
+                <h1 class="text-9xl font-bold mb-4 text-white">365</h1>
+                <p class="text-3xl font-semibold mb-6 text-white">Hari Penuh Cinta</p>
+                <div class="flex items-center gap-6 text-2xl text-white"><span class="text-4xl">💖</span><span>Forever Together</span><span class="text-4xl">💖</span></div>
+            </div>
+
+            <!-- ---------- Birthday Message (overlay) ---------- -->
+            <div id="birthdayMsg" class="app-panel flex flex-col items-center justify-center">
+                <h1 class="text-5xl font-bold mb-6 text-white"> 🎀 𝓗𝓐𝓛𝓛𝓞 𝓜𝓨 𝓜𝓞𝓞𝓘𝓔 𝓥𝓡𝓞𝓤𝓦 "𝓡𝓔𝓜𝓔𝓜𝓑𝓔𝓡 𝓘𝓣?" 🎀</h1>
+                <div class="bg-black bg-opacity-50 p-6 rounded-xl mb-6 w-full max-w-2xl">
+                    <iframe 
+                        src="https://open.spotify.com/embed/album/7cCDE3ZZwmD94SKVKCLXAO?utm_source=generator&theme=0" 
+                        width="100%" 
+                        height="352" 
+                        frameborder="0" 
+                        allowfullscreen="" 
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                        loading="lazy"
+                        class="rounded-xl">
+                    </iframe>
+                </div>
+                <div style="max-width:720px; color:white; text-align:center;">
+                    <p>HALLO AGEN KITSU43V3R HOW WAS YOUR WHOLE DAY WITH OUT ME!
+
+                        SEBELUM BACA SURATNYA HARUS DI PLAY YAA SPOTIFYNYA ;v
+                    </p>
+                    <p>Look at you, you do a great day right, you still have a best friend around you right ✨</p>
+                    <p style="margin-top:12px; font-weight:700;">I WISH YOU ALWAYS CAN SHARE YOUR HAPPY ENERGY TO PEOPLE AROUND YOU</p>
+                </div>
+                
+                <div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; justify-content: center;">
+                    <button class="btn btn-primary" onclick="openLetterFromBirthday()">💌 SURAT DARI FANSMU</button>
+                    <a href="https://api.whatsapp.com/send/?phone=6281586811542&text&type=phone_number&app_absent=0" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="btn btn-success">
+                        TELL ME HOW BAD YOUR DAYS WITH OUT ME
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE 5: GALLERY / CAROUSEL ========= -->
+    <div class="page" id="page5">
+        <div class="gallery-container">
+            <h1 style="color:#ff6b35; font-size:2rem; margin-bottom:18px; font-weight:800;">📸 foto orang spesial 📸</h1>
+            <div class="carousel-container">
+                <div class="carousel-track" id="carouselTrack"></div>
+                <button class="carousel-nav prev" onclick="previousImage()">‹</button>
+                <button class="carousel-nav next" onclick="nextImage()">›</button>
+            </div>
+            <div style="margin-top:18px; color:#667eea; font-weight:700; font-size:1rem;" id="imageCounter">1 / 5</div>
+            <div style="margin-top:22px;">
+                <button class="btn btn-primary" onclick="goToPage(4)">↩️ KEMBALI</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE 6: LETTER ========= -->
+    <div class="page" id="page6">
+        <div class="letter-container">
+            <h2 class="text-3xl font-bold mb-4" style="color:#ff6b35; text-align:center;">💌 Dear Kitsu43v3r (Kirana)</h2>
+            <p style="color:#333;">
+                <span id="letterContent" class="typed-text"></span>
+            </p>
+            <p class="mt-8 text-right font-bold" style="color:#333;">- Bizm</p>
+            <div style="text-align:center; margin-top:22px;">
+                <button class="btn btn-primary" onclick="goToPage(4)">🏠 KEMBALI KE HOME SCREEN</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+/* ================== NAVIGATION & TRANSITIONS ================== */
+function goToPage(pageNumber) {
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(p => p.classList.remove('active'));
+    
+    setTimeout(() => {
+        const target = document.getElementById('page' + pageNumber);
+        if (!target) return;
+        target.classList.add('active');
+
+        if (pageNumber === 4) showHome();
+        if (pageNumber === 6) startTypingIfNeeded();
+        if (pageNumber === 5) initializeCarouselIfNeeded();
+    }, 50);
+}
+
+/* ================== PAGE2: refuseOpen ================== */
+function refuseOpen(e) {
+    const btn = e ? e.currentTarget : null;
+    document.getElementById('refuseMessage').style.display = 'block';
+    if (btn) btn.style.display = 'none';
+    setTimeout(() => alert('🚨 AKSES DITOLAK! Kamu harus SIAP untuk melanjutkan misi! 🚨'), 700);
+}
+
+/* ================== PAGE3: checkAnswer WITH SPOTIFY AUTOPLAY ================== */
+function checkAnswer() {
+    const answer = document.getElementById('answerInput').value.trim().toLowerCase();
+    const correct = 'kiranceu bokem';
+    
+    if (answer === correct) {
+        // Reload Spotify iframe dengan autoplay
+        const spotifyFrame = document.getElementById('spotifyFrame');
+        spotifyFrame.src = 'https://open.spotify.com/embed/track/1nYdkPCbHdYi4w7s2L6SHA?utm_source=generator&theme=0&autoplay=1';
+        
+        // Pindah ke page 4
+        goToPage(4);
+    } else {
+        const notif = document.getElementById('wrongNotification');
+        const countdownEl = document.getElementById('countdown');
+        let count = 5;
+        notif.style.display = 'block';
+        countdownEl.innerText = count;
+        
+        const interval = setInterval(() => {
+            count--;
+            countdownEl.innerText = count;
+            if (count <= 0) {
+                clearInterval(interval);
+                notif.style.display = 'none';
+                document.getElementById('answerInput').value = '';
+                goToPage(2);
+            }
+        }, 1000);
+    }
+}
+
+/* ================== PAGE4: app open/close ================== */
+function showHome() {
+    document.querySelectorAll('#appContainer .app-panel').forEach(el => el.classList.remove('active'));
+    document.getElementById('homeScreen').classList.remove('hidden');
+}
+
+function openApp(appId) {
+    document.getElementById('homeScreen').classList.add('hidden');
+    document.querySelectorAll('#appContainer .app-panel').forEach(el => el.classList.remove('active'));
+    const panel = document.getElementById(appId + 'App');
+    if (panel) panel.classList.add('active');
+    
+    if (appId === 'camera') startCamera();
+    if (appId === 'whatsapp') scrollMessagesToBottom(); 
+}
+
+function closeApp() {
+    document.querySelectorAll('#appContainer .app-panel').forEach(el => el.classList.remove('active'));
+    document.getElementById('homeScreen').classList.remove('hidden');
+    stopCameraIfOn();
+}
+
+/* ================== GALLERY UPLOAD ================== */
+const imageGalleryEl = document.getElementById('imageGallery');
+document.getElementById('fileInput').addEventListener('change', (e) => {
+    const files = Array.from(e.target.files).slice(0, 30);
+    files.forEach(file => {
+        if (!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const img = document.createElement('img');
+            img.src = ev.target.result;
+            img.className = 'thumbnail';
+            imageGalleryEl.prepend(img);
+
+            galleryData.unshift({ imageUrl: ev.target.result, title: file.name, desc: 'Added from device' });
+            updateCarouselItems();
+        };
+        reader.readAsDataURL(file);
+    });
+});
+
+/* ================== CAMERA (getUserMedia) ================== */
+let videoStream = null;
+let usingFacingMode = 'user';
+const cameraVideo = document.getElementById('cameraVideo');
+
+async function startCamera() {
+    try {
+        stopCameraIfOn();
+        const constraints = { video: { facingMode: usingFacingMode }, audio: false };
+        videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+        cameraVideo.srcObject = videoStream;
+    } catch (err) {
+        console.error('Camera error:', err);
+        alert('Tidak bisa mengakses kamera. Pastikan izin diberikan dan jalankan di HTTPS atau localhost.');
+    }
+}
+
+function stopCameraIfOn() {
+    if (videoStream) {
+        videoStream.getTracks().forEach(t => t.stop());
+        videoStream = null;
+    }
+    cameraVideo.srcObject = null;
+}
+
+function switchCamera() {
+    usingFacingMode = usingFacingMode === 'user' ? 'environment' : 'user';
+    startCamera();
+}
+
+function capturePhoto() {
+    if (!videoStream) { alert('Kamera tidak aktif'); return; }
+    const canvas = document.getElementById('captureCanvas');
+    const video = cameraVideo;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    const dataUrl = canvas.toDataURL('image/png');
+    imageGalleryEl.prepend(createThumbElement(dataUrl, 'capture.png'));
+    galleryData.unshift({ imageUrl: dataUrl, title: 'Capture', desc: 'Photo taken from camera' });
+    updateCarouselItems();
+    alert('Foto diambil dan ditambahkan ke gallery.');
+}
+
+function downloadCapture() {
+    const canvas = document.getElementById('captureCanvas');
+    if (!canvas.width) { alert('Belum ada foto. Klik Capture terlebih dahulu.'); return; }
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'capture-' + Date.now() + '.png';
+    a.click();
+}
+
+function createThumbElement(src, name) {
+    const img = document.createElement('img');
+    img.src = src;
+    img.className = 'thumbnail';
+    img.alt = name || 'image';
+    return img;
+}
+
+/* ================== WHATSAPP SIM ================== */
+const messagesContainer = document.getElementById('messagesContainer');
+
+function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const text = input.value.trim();
+    if (!text) return;
+    appendMessage(text, 'sent');
+    input.value = '';
+    
+    setTimeout(() => {
+        const replies = [
+            'Aww, makasih sayang 💕',
+            'Kamu sweet banget sih 😘',
+            'Aku juga sayang kamu ❤️',
+            'Hihi gemesin deh 🥰'
+        ];
+        const randomReply = replies[Math.floor(Math.random() * replies.length)];
+        appendMessage(randomReply, 'received');
+    }, 900);
+}
+
+function appendMessage(text, type) {
+    const wrap = document.createElement('div');
+    wrap.style.display = 'flex';
+    if (type === 'sent') {
+        wrap.style.justifyContent = 'flex-end';
+        const b = document.createElement('div');
+        b.className = 'message-bubble message-sent';
+        b.innerText = text;
+        wrap.appendChild(b);
+    } else {
+        wrap.style.justifyContent = 'flex-start';
+        const b = document.createElement('div');
+        b.className = 'message-bubble message-received';
+        b.innerText = text;
+        wrap.appendChild(b);
+    }
+    messagesContainer.appendChild(wrap);
+    scrollMessagesToBottom();
+}
+
+function scrollMessagesToBottom() {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+appendMessage('Hai sayang! 🎀', 'received');
+appendMessage('Aku seneng banget hari ini! 🎂', 'received');
+
+/* ================== CAROUSEL (MEMORIES PAGE 5) ================== */
+let galleryData = [
+    { imageUrl: 'https://picsum.photos/800/420?random=11', title: 'First Victory!', desc: 'Moment lucu' },
+    { imageUrl: 'https://picsum.photos/800/420?random=12', title: 'Moodbooster', desc: 'Bikin senyum' },
+    { imageUrl: 'https://picsum.photos/800/420?random=13', title: 'New Glasses', desc: 'Cantik banget' },
+    { imageUrl: 'https://picsum.photos/800/420?random=14', title: 'Pagi hari', desc: 'Sarapan bareng' },
+    { imageUrl: 'https://picsum.photos/800/420?random=15', title: 'Office Look', desc: 'Siap kerja' },
+];
+
+const carouselTrack = document.getElementById('carouselTrack');
+let currentImageIndex = 0;
+
+function initializeCarouselIfNeeded() {
+    if (carouselTrack.children.length === 0) updateCarouselItems();
+    updateCarousel();
+}
+
+function updateCarouselItems() {
+    carouselTrack.innerHTML = '';
+    galleryData.forEach((item) => {
+        const div = document.createElement('div');
+        div.className = 'carousel-item';
+        div.innerHTML = `
+            <div class="placeholder-image"><img src="${item.imageUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover; border-radius:12px;"></div>
+            <div style="font-weight:700; margin-top:8px; color:#333;">${item.title}</div>
+            <div style="opacity:.8; margin-top:6px; color:#666;">${item.desc}</div>
+        `;
+        carouselTrack.appendChild(div);
+    });
+    updateImageCounter();
+}
+
+function updateImageCounter() {
+    const counter = document.getElementById('imageCounter');
+    counter.innerText = `${currentImageIndex + 1} / ${Math.max(1, galleryData.length)}`;
+}
+
+function previousImage() {
+    if (currentImageIndex > 0) currentImageIndex--; 
+    else currentImageIndex = galleryData.length - 1;
+    updateCarousel();
+}
+
+function nextImage() {
+    if (currentImageIndex < galleryData.length - 1) currentImageIndex++; 
+    else currentImageIndex = 0;
+    updateCarousel();
+}
+
+function updateCarousel() {
+    const translateX = -currentImageIndex * 100;
+    carouselTrack.style.transform = `translateX(${translateX}%)`;
+    updateImageCounter();
+}
+
+/* ================== LETTER TYPING (PAGE 6) ================== */
+const letterText = `Hai Sayangku Kirana 💖
+
+Hallo kirana prameswari.
+Sebelumnya kenalkan aku bisma sakti hamdallah, aku orang yang berbeda
+dari saat pertama kali kita bertemu,
+aku seseorang yang memiliki nafsu, memiliki perasaan,
+memiliki keinginan, memiliki kebahagiaan,
+memiliki kekurangan, memiliki batasan, bisa lelah, bisa tidak semangat,
+bisa ovt, bisa cemburu, bisa habis tenaganya.
+
+tapi sepertinya kamu sudah menyadari itu yaa. 
+terimakasih yaa 
+sudah rela berkorban, rela menunggu, rela bersakit-sakit, rela merendah.
+thanks a lot sayang.
+
+maafkan aku belum bisa menjadi seseorang yang dapat kamu banggakan ya,
+belum bisa membuat kamu merasa aman
+belum bisa membahagiakan kamu sepenuhnya.
+maafkan aku juga masih banyak kurangnya di hubungan ini, 
+maafkan aku yang masih iri kepada mantanmu,
+maafkan aku yang masih kurang baik dalam memperlakukanmu,
+maafkan aku yang masih kurang dalam berkomunikasi.
+
+yang pasti aku akan tetap selalu berjuang untuk orang yang aku sayang
+yaitu adalah kamu kirana prameswari.
+
+terimkasih karna kamu sudah mau menunggu aku
+untuk menyendiri beberapa hari ini.
+
+aku sadar kamu juga manusia kamu punya ke inginan
+kamu punya perasaan, kamu punya kebahagiaan
+punya semua yang aku punya.
+
+oleh karna itu aku mau berterimakasih kepadamu karna sudah menjadi
+wanita terbaik dalam hidupku masih banyak yang mau aku sampaikan
+tentang keluh kesah ku kepadamu.
+tapi sepertinya secarik surat dalam codingan ini
+tidak akan cukup untuk menyampaikannya, jadi aku akan menyudahi 
+pertapaan ini dan kembali dalam dekapan hangatmu sayang.
+
+aku ucapkan kepada kamu orang yang sangat baik dalam hidupku.
+terimakasih sayangku, cintaku, harapanku, semestaku, duniaku, 
+kirana prameswari atas segala pengorbananmu untukku💕.
+
+salam cinta dari lelakimu 
+yang memiliki cinta setinggi gunung himalaya💕.
+Tertanda 
+BISMA SAKTI HAMDALLAH SI MACAN GEOL💕`;
+
+let typingIndex = 0;
+let typingStarted = false;
+
+function startTypingIfNeeded() {
+    if (typingStarted) return;
+    typingStarted = true;
+    const el = document.getElementById('letterContent');
+    el.innerHTML = '';
+    typeWriter(el, letterText, 0);
+}
+
+function typeWriter(el, text, i) {
+    if (i < text.length) {
+        const ch = text.charAt(i);
+        el.innerHTML += ch === '\n' ? '<br>' : (ch === ' ' ? '&nbsp;' : ch);
+        setTimeout(() => typeWriter(el, text, i + 1), 35);
+    }
+}
+
+/* ================== Birthday Tulip Rain ================== */
+let tulipInterval = null;
+
+function startTulipRain() {
+    stopTulipRain();
+    tulipInterval = setInterval(createTulip, 300);
+}
+
+function stopTulipRain() {
+    if (tulipInterval) { 
+        clearInterval(tulipInterval); 
+        tulipInterval = null; 
+    }
+}
+
+function createTulip() {
+    const t = document.createElement('div');
+    t.className = 'tulip';
+    t.innerText = ['🌷','🌸','💐','🌺','🌻'][Math.floor(Math.random()*5)];
+    t.style.left = (Math.random()*90) + '%';
+    t.style.fontSize = (Math.random()*1.8 + 1) + 'rem';
+    t.style.animationDuration = (Math.random()*3+3)+'s';
+    document.body.appendChild(t);
+    setTimeout(()=> t.remove(), 6500);
+}
+
+function showBirthdayMessage() {
+    openApp('birthdayMsg');
+    startTulipRain();
+}
+
+function openLetterFromBirthday() {
+    stopTulipRain();
+    goToPage(6);
+}
+
+/* ================== Initialize ================== */
+window.addEventListener('load', () => {
+    galleryData.slice(0,3).forEach(item => imageGalleryEl.appendChild(createThumbElement(item.imageUrl, item.title)));
+    scrollMessagesToBottom();
+});
+
+window.addEventListener('beforeunload', () => {
+    stopCameraIfOn();
+});
+</script>
+
+</body>
+</html>
